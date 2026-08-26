@@ -61,8 +61,17 @@ module cla64_flat(
   //
   // TODO: paste your verified assign statements for c[1] through c[64] here.
 
-  assign cout = c[64];
+  
+  genvar k;
+  generate
+    for (k = 0; k < 64; k = k + 1) begin : gen_carries
+        assign #(2) c[k+1] = g[k] | (p[k] & c[k]);
+    end
+  endgenerate
 
+// Final Sum Generation
+  assign sum = p ^ c[63:0];
+  assign cout = c[64];
   // ---------------------------------------------------------------------
   // Step 3: sum bits
   // ---------------------------------------------------------------------
