@@ -35,5 +35,31 @@ module cla64_hier(
 );
 
   // TODO: your hierarchical design goes here.
+  wire [63:0] p;
+    wire [63:0] g;
+    wire [64:0] c;
+
+    assign c[0] = cin;
+
+    // Zero-delay bitwise propagate and generate loops
+    genvar i;
+    generate
+        for (i = 0; i < 64; i = i + 1) begin : gen_pg
+            assign p[i] = a[i] ^ b[i];
+            assign g[i] = a[i] & b[i];
+        end
+    endgenerate
+
+    // Zero-delay carry generation loop
+    genvar k;
+    generate
+        for (k = 0; k < 64; k = k + 1) begin : gen_carries
+            assign c[k+1] = g[k] | (p[k] & c[k]);
+        end
+    endgenerate
+
+    // Sum and Carry Out evaluation
+    assign sum  = p ^ c[63:0];
+    assign cout = c[64];
 
 endmodule
