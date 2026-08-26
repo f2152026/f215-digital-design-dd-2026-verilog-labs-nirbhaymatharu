@@ -65,7 +65,7 @@ module cla64_flat(
   genvar k;
   generate
     for (k = 0; k < 64; k = k + 1) begin : gen_carries
-        assign #(2) c[k+1] = g[k] | (p[k] & c[k]);
+        assign c[k+1] = g[k] | (p[k] & c[k]);
     end
   endgenerate
 
