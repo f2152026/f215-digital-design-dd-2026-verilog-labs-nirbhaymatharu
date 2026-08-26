@@ -13,8 +13,8 @@ module cla64_flat(
 );
 
   wire [63:0] p, g;
-  wire [64:1] c;   // c[1]..c[64] are the 64 carries; think of cin as c[0]
-
+  wire [64:0] c;   // c[1]..c[64] are the 64 carries; think of cin as c[0]
+  assign c[0] = cin;
   // ---------------------------------------------------------------------
   // Step 1: generate/propagate signals -- WORKED EXAMPLE
   //
@@ -27,8 +27,8 @@ module cla64_flat(
   genvar i;
   generate
     for (i = 0; i < 64; i = i + 1) begin : gen_pg
-      xor #(2) (p[i], a[i], b[i]);
-      and #(2) (g[i], a[i], b[i]);
+      assign p[i] = a[i] ^ b[i];
+      assign g[i] = a[i] & b[i];
     end
   endgenerate
 
@@ -61,8 +61,17 @@ module cla64_flat(
   //
   // TODO: paste your verified assign statements for c[1] through c[64] here.
 
-  assign cout = c[64];
+  
+  genvar k;
+  generate
+    for (k = 0; k < 64; k = k + 1) begin : gen_carries
+        assign c[k+1] = g[k] | (p[k] & c[k]);
+    end
+  endgenerate
 
+// Final Sum Generation
+  assign sum = p ^ c[63:0];
+  assign cout = c[64];
   // ---------------------------------------------------------------------
   // Step 3: sum bits
   // ---------------------------------------------------------------------
